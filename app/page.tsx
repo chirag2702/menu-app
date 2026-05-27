@@ -451,7 +451,7 @@ export default function Home() {
                           </div>
                           
                           <div className="space-y-2.5">
-                            {order.items.map((item, idx) => (
+                            {order.items.map((item: any, idx: number) => (
                               <div key={idx} className="flex justify-between items-center text-[14px]">
                                 <span className="font-medium text-gray-800"><span className="text-gray-400 mr-2">{item.qty}x</span>{item.name}</span>
                                 <span className="font-semibold text-gray-900">₹{(item.qty * parseFloat(item.price)).toFixed(2)}</span>
@@ -488,7 +488,7 @@ export default function Home() {
                           </div>
                           
                           <div className="space-y-1">
-                            {order.items.map((item, idx) => (
+                            {order.items.map((item: any, idx: number) => (
                               <p key={idx} className="text-[13px] text-gray-600 font-medium line-clamp-1">
                                 {item.qty}x {item.name}
                               </p>
