@@ -1,0 +1,8 @@
+{
+  "name": "LumiDine Menu App",
+  "description": "A beautiful restaurant menu application with ordering capabilities.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
