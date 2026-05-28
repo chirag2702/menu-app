@@ -29,40 +29,40 @@ export default function Home() {
     if (savedOrders) {
       try {
         setMyOrderIds(JSON.parse(savedOrders));
-      } catch(e) {}
+      } catch (e) { }
     }
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/data');
+        const res = await fetch('/api/data');
         const data = await res.json();
-        
+
         if (data.categories) {
           setCategoriesList(data.categories);
         }
         if (data.menuItems) {
-           const parsedItems = data.menuItems
-             .filter((i: any) => i.inStock !== false)
-             .map((i: any) => ({
-               ...i,
-               price: typeof i.price === 'string' ? parseFloat(i.price.replace('₹', '').replace(',', '')) : (i.price || 0)
-             }));
-           setMenuItemsList(parsedItems);
+          const parsedItems = data.menuItems
+            .filter((i: any) => i.inStock !== false)
+            .map((i: any) => ({
+              ...i,
+              price: typeof i.price === 'string' ? parseFloat(i.price.replace('₹', '').replace(',', '')) : (i.price || 0)
+            }));
+          setMenuItemsList(parsedItems);
         }
         if (data.chefSelections) {
-           const parsedChefs = data.chefSelections.map((i: any) => ({
-             ...i,
-             price: typeof i.price === 'string' ? parseFloat(i.price.replace('₹', '').replace(',', '')) : (i.price || 0)
-           }));
-           setChefsSelectionList(parsedChefs);
+          const parsedChefs = data.chefSelections.map((i: any) => ({
+            ...i,
+            price: typeof i.price === 'string' ? parseFloat(i.price.replace('₹', '').replace(',', '')) : (i.price || 0)
+          }));
+          setChefsSelectionList(parsedChefs);
         }
         if (data.liveOrders) {
-           setLiveOrders(data.liveOrders);
+          setLiveOrders(data.liveOrders);
         }
       } catch (err) {
         console.error('Failed to fetch data', err);
       }
     };
-    
+
     fetchData();
     const interval = setInterval(fetchData, 10000); // sync every 10s
     return () => clearInterval(interval);
@@ -81,14 +81,14 @@ export default function Home() {
     }
   }, []);
 
-  const filteredItems = menuItemsList.filter(item => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredItems = menuItemsList.filter(item =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (item.desc && item.desc.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const [cart, setCart] = useState<Array<{id: string; name: string; price: number; image: string; quantity: number; instructions?: string; showInstructions?: boolean}>>([]);
+  const [cart, setCart] = useState<Array<{ id: string; name: string; price: number; image: string; quantity: number; instructions?: string; showInstructions?: boolean }>>([]);
 
-  const addToCart = (item: {id: string, name: string, price: number, image: string}, quantity = 1) => {
+  const addToCart = (item: { id: string, name: string, price: number, image: string }, quantity = 1) => {
     setCart(prev => {
       const existing = prev.find(i => i.id === item.id);
       if (existing) {
@@ -153,14 +153,14 @@ export default function Home() {
         total: cartTotal.toFixed(2)
       };
 
-      const res = await fetch('http://localhost:5000/api/orders', {
+      const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)
       });
-      
+
       const newOrder = await res.json();
-      
+
       if (newOrder && newOrder.id) {
         const updatedIds = [...myOrderIds, newOrder.id];
         setMyOrderIds(updatedIds);
@@ -181,9 +181,9 @@ export default function Home() {
         <h1 className="text-xl font-bold text-[#9e3b00] tracking-tight shrink-0 mr-1">LumiDine</h1>
         <div className="flex-1 flex items-center bg-white border border-gray-200 rounded-full px-3 py-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <Search className="w-[18px] h-[18px] text-gray-400 mr-2 shrink-0" />
-          <input 
-            type="text" 
-            placeholder="Search menu..." 
+          <input
+            type="text"
+            placeholder="Search menu..."
             className="bg-transparent border-none outline-none text-[14px] w-full text-gray-900 placeholder:text-gray-400"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -210,14 +210,14 @@ export default function Home() {
                   <p className="font-semibold mb-1">Camera Error</p>
                   <p className="text-sm opacity-90">{scannerError}</p>
                 </div>
-                <button 
+                <button
                   onClick={() => setIsScannerOpen(false)}
                   className="bg-white/10 hover:bg-white/20 px-6 py-2 rounded-xl transition-colors text-sm font-medium">
                   Go Back
                 </button>
               </div>
             ) : (
-              <Scanner 
+              <Scanner
                 onScan={(result) => {
                   if (result && result.length > 0) {
                     const text = result[0].rawValue || '';
@@ -229,7 +229,7 @@ export default function Home() {
                     }
                     setIsScannerOpen(false);
                   }
-                }} 
+                }}
                 onError={(error) => {
                   console.error(error?.message);
                   setScannerError(error?.message || 'Failed to access camera');
@@ -297,7 +297,7 @@ export default function Home() {
                   {chefsSelectionList.map((item, idx) => (
                     <SwiperSlide key={item.id}>
                       <div className="relative rounded-2xl overflow-hidden h-[200px] shadow-[0_4px_15px_rgba(0,0,0,0.05)] w-full border border-gray-100">
-                        <img 
+                        <img
                           src={item.image}
                           alt={item.name}
                           className="w-full h-full object-cover"
@@ -316,7 +316,7 @@ export default function Home() {
                           </p>
                           <div className="flex items-center justify-between">
                             <p className="text-white font-bold text-[20px]">₹{item.price.toFixed(2)}</p>
-                            <button 
+                            <button
                               onClick={() => addToCart(item, 1)}
                               className="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white text-[12px] font-bold px-3 py-1.5 rounded-lg transition-colors">
                               Add
@@ -340,7 +340,7 @@ export default function Home() {
           {/* Dynamic Category Sections */}
           {(viewCategory === 'none' ? categoriesList : [viewCategory]).map(category => {
             const categoryItems = filteredItems.filter(item => item.category === category);
-            
+
             if (categoryItems.length === 0 && (!searchQuery || viewCategory !== 'none')) return null;
 
             return (
@@ -362,7 +362,7 @@ export default function Home() {
                     <h1 className="text-2xl font-bold tracking-tight text-gray-900 capitalize">{category.toLowerCase()}</h1>
                   </div>
                 )}
-                
+
                 {viewCategory !== 'none' && categoryItems.length === 0 && (
                   <div className="text-center py-12">
                     <p className="text-gray-500 font-medium">No items in this category.</p>
@@ -375,7 +375,7 @@ export default function Home() {
                     return (
                       <div key={item.id} className="p-4 rounded-[1.3rem] flex gap-4 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 bg-white">
                         <div className="relative w-20 h-20 rounded-[14px] overflow-hidden shrink-0 bg-[#f4f4f4] border border-gray-100">
-                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer"/>
+                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                         </div>
                         <div className="flex-1 flex flex-col justify-center py-0.5">
                           <div className="flex justify-between items-start mb-0.5">
@@ -388,7 +388,7 @@ export default function Home() {
                           <div className="flex items-center justify-between mt-auto">
                             <span className="font-bold text-[#b34800] text-[16px]">₹{item.price.toFixed(2)}</span>
                             {cartItem ? renderQtyControl(item.id, cartItem.quantity) : (
-                              <button 
+                              <button
                                 onClick={() => addToCart(item, 1)}
                                 className="bg-[#b34800] hover:bg-[#9e3b00] text-white text-[13px] font-bold px-[18px] h-[32px] rounded-lg transition-colors flex items-center justify-center">
                                 Add
@@ -411,7 +411,7 @@ export default function Home() {
 
           {(() => {
             const myOrders = liveOrders.filter(o => myOrderIds.includes(o.id)).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-            
+
             const activeOrders = myOrders.filter(o => o.status === 'new' || o.status === 'preparing' || o.status === 'urgent');
             const pastOrders = myOrders.filter(o => o.status === 'served' || o.status === 'paid');
 
@@ -449,7 +449,7 @@ export default function Home() {
                               {order.status}
                             </span>
                           </div>
-                          
+
                           <div className="space-y-2.5">
                             {order.items.map((item: any, idx: number) => (
                               <div key={idx} className="flex justify-between items-center text-[14px]">
@@ -458,7 +458,7 @@ export default function Home() {
                               </div>
                             ))}
                           </div>
-                          
+
                           <div className="flex justify-between items-center pt-2 border-t border-gray-50 mt-1">
                             <span className="text-[14px] text-gray-500 font-medium">Total</span>
                             <span className="font-bold text-[16px] text-gray-900">₹{order.total}</span>
@@ -473,7 +473,7 @@ export default function Home() {
                 {pastOrders.length > 0 && (
                   <section className="pt-2">
                     <h2 className="text-[15px] font-semibold mb-3 text-gray-900">Past Orders</h2>
-                    
+
                     <div className="space-y-3.5">
                       {pastOrders.map(order => (
                         <div key={order.id} className="bg-white rounded-[1.3rem] p-4 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border-gray-100 flex flex-col gap-3 opacity-70">
@@ -486,7 +486,7 @@ export default function Home() {
                               <CheckCircle2 className="w-4 h-4" /> {order.status}
                             </span>
                           </div>
-                          
+
                           <div className="space-y-1">
                             {order.items.map((item: any, idx: number) => (
                               <p key={idx} className="text-[13px] text-gray-600 font-medium line-clamp-1">
@@ -494,7 +494,7 @@ export default function Home() {
                               </p>
                             ))}
                           </div>
-                          
+
                           <div className="flex justify-between items-center pt-2 border-t border-gray-50 mt-1">
                             <span className="font-bold text-[15px] text-gray-900">₹{order.total}</span>
                           </div>
@@ -527,7 +527,7 @@ export default function Home() {
                 <div key={item.id} className="bg-white rounded-[1.3rem] p-4 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border-gray-100 flex flex-col gap-3">
                   <div className="flex gap-4">
                     <div className="relative w-20 h-20 rounded-[14px] overflow-hidden shrink-0 bg-[#f4f4f4] border border-gray-100">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer"/>
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     </div>
                     <div className="flex-1 flex flex-col justify-between py-0.5">
                       <div className="flex justify-between items-start">
@@ -551,13 +551,13 @@ export default function Home() {
 
                   <div className="border-t border-gray-50 pt-2 mt-1">
                     {!item.showInstructions ? (
-                      <button 
+                      <button
                         onClick={() => toggleItemInstructions(item.id, true)}
                         className="w-full text-left text-[13px] font-medium transition-colors flex justify-between items-center py-1">
                         {item.instructions ? (
-                           <span className="text-gray-900 line-clamp-1"><span className="font-semibold mr-1">Note:</span>{item.instructions}</span>
+                          <span className="text-gray-900 line-clamp-1"><span className="font-semibold mr-1">Note:</span>{item.instructions}</span>
                         ) : (
-                           <span className="text-gray-500">+ Add cooking instructions or allergy info</span>
+                          <span className="text-gray-500">+ Add cooking instructions or allergy info</span>
                         )}
                         {item.instructions && <span className="text-[#b34800] text-[12px] font-bold shrink-0 ml-2">Edit</span>}
                       </button>
@@ -565,13 +565,13 @@ export default function Home() {
                       <div className="flex flex-col gap-2">
                         <div className="flex justify-between items-center">
                           <span className="text-[13px] font-semibold text-gray-900">Cooking Instructions</span>
-                          <button 
+                          <button
                             onClick={() => toggleItemInstructions(item.id, false)}
                             className="text-[12px] text-[#b34800] font-bold hover:opacity-80 transition-opacity">
                             Done
                           </button>
                         </div>
-                        <textarea 
+                        <textarea
                           value={item.instructions || ''}
                           onChange={(e) => updateItemInstructions(item.id, e.target.value)}
                           placeholder="e.g. No onions, extra spicy..."
@@ -638,7 +638,7 @@ export default function Home() {
           {/* Profile Options */}
           <section className="space-y-4">
             <h2 className="text-[15px] font-semibold text-gray-900 ml-1">Account & Settings</h2>
-            
+
             <div className="bg-white rounded-[1.3rem] overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.03)] flex flex-col">
               <button className="flex items-center justify-between p-4 bg-white hover:bg-gray-50/50 transition-colors border-b border-gray-50">
                 <div className="flex items-center gap-3">
@@ -693,7 +693,7 @@ export default function Home() {
       {/* Floating Cart Button (only on menu tab) */}
       {activeTab === 'menu' && cart.length > 0 && (
         <div className="fixed bottom-[90px] right-4 flex justify-end pointer-events-none z-20">
-          <button 
+          <button
             onClick={() => setActiveTab('cart')}
             className="pointer-events-auto bg-[#ab4500] text-white rounded-full py-2.5 px-4 flex items-center gap-[14px] shadow-xl hover:bg-[#913b00] transition-colors shadow-[#a64800]/25 border border-[#c25100]/50">
             <div className="relative ml-1">
@@ -712,7 +712,7 @@ export default function Home() {
 
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 w-full bg-white flex justify-around items-center pt-2 pb-6 px-2 shadow-[0_-10px-30px-rgba(0,0,0,0.04)] z-30 mb-[-1px]">
-        <button 
+        <button
           onClick={() => setActiveTab('menu')}
           className={`flex flex-col items-center justify-center w-16 gap-[5px] transition-colors ${activeTab === 'menu' ? 'text-[#b34800]' : 'text-gray-400 hover:text-gray-600'}`}
         >
@@ -721,7 +721,7 @@ export default function Home() {
           </div>
           <span className={`text-[11px] ${activeTab === 'menu' ? 'font-bold' : 'font-medium mt-[1px]'}`}>Menu</span>
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab('orders')}
           className={`flex flex-col items-center justify-center w-16 gap-[5px] transition-colors ${activeTab === 'orders' ? 'text-[#b34800]' : 'text-gray-400 hover:text-gray-600'}`}
         >
@@ -730,7 +730,7 @@ export default function Home() {
           </div>
           <span className={`text-[11px] ${activeTab === 'orders' ? 'font-bold' : 'font-medium mt-[1px]'}`}>Orders</span>
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab('cart')}
           className={`flex flex-col items-center justify-center w-16 gap-[5px] transition-colors ${activeTab === 'cart' ? 'text-[#b34800]' : 'text-gray-400 hover:text-gray-600'}`}
         >
@@ -742,7 +742,7 @@ export default function Home() {
           </div>
           <span className={`text-[11px] ${activeTab === 'cart' ? 'font-bold' : 'font-medium mt-[1px]'}`}>Cart</span>
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab('profile')}
           className={`flex flex-col items-center justify-center w-16 gap-[5px] transition-colors ${activeTab === 'profile' ? 'text-[#b34800]' : 'text-gray-400 hover:text-gray-600'}`}
         >
