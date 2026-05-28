@@ -36,7 +36,13 @@ export default function Home() {
         const res = await fetch('/api/data');
         const data = await res.json();
 
-        if (data.categories) {
+        if (data.categories && data.menuItems) {
+          const uniqueCats = new Set<string>(data.categories);
+          data.menuItems.forEach((item: any) => {
+            if (item.category) uniqueCats.add(item.category);
+          });
+          setCategoriesList(Array.from(uniqueCats));
+        } else if (data.categories) {
           setCategoriesList(data.categories);
         }
         if (data.menuItems) {
